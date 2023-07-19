@@ -62,13 +62,6 @@ graph = gs.export_onnx(graph)
 graph.ir_version = 8 # need to downgrade the ir version
 onnx.save(graph, f"../onnx_models/{model_name}-fpgaconvnet.onnx")
 
-# import taso
-
-# old_model = taso.load_onnx(f"../onnx_models/{model_name}-fpgaconvnet.onnx")
-# taso_graph = taso.optimize(old_model)
-# new_model = taso.export_onnx(taso_graph)
-# onnx.save(new_model, f"../onnx_models/{model_name}-taso-fpgaconvnet.onnx")
-
 # create a parser
 parser = Parser(backend="chisel", quant_mode="auto", convert_gemm_to_conv=False, custom_onnx=False)
 
@@ -77,4 +70,26 @@ net = parser.onnx_to_fpgaconvnet(f"../onnx_models/{model_name}-fpgaconvnet.onnx"
         "../platforms/zcu104.toml", False, save_opt_model=True)
 net.update_partitions()
 
+# set fine to max for all layers
+for node in net.partitions[0].graph.nodes:
+    if net.partitions[0].graph.nodes[node]["type"] == LAYER_TYPE.Convolution:
+        net.partitions[0].graph.nodes[node]["hw"].fine = np.prod(net.partitions[0].graph.nodes[node]["hw"].kernel_size)
+
+# give correct scales to the resize layers
+net.partitions[0].graph.nodes["Resize_72"]["hw"].scales = [2, 2, 1]
+net.partitions[0].graph.nodes["Resize_84"]["hw"].scales = [2, 2, 1]
+net.update_partitions()
+
+# get resource and performance estimates
+print(f"predicted latency (us): {net.get_latency()*1000000}")
+print(f"predicted throughput (img/s): {net.get_throughput()} (batch size={net.batch_size})")
+print(f"predicted resource usage: {net.partitions[0].get_resource_usage()}")
+
+# for node, edges in net.partitions[0].graph.adjacency():
+#     print(node, list(edges))
+
+
+# save the configuration file
+net.save_all_partitions("config-baseline.json")
+net.create_report("report.json")
 
