@@ -10,7 +10,6 @@ from fpgaconvnet.tools.layer_enum import LAYER_TYPE
 # definition of the model name
 input_model_path = sys.argv[1]
 output_model_path = sys.argv[2]
-model_name = "yolov5n"
 
 # edit the onnx graph to remove the post-processing
 graph = onnx.load(input_model_path)
