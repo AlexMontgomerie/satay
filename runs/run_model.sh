@@ -38,7 +38,7 @@ MODEL_PATH=../onnx_models/${FAMILY}/${MODEL_NAME}.onnx
 FPGACONVNET_MODEL_PATH=../onnx_models/${FAMILY}/${MODEL_NAME}-fpgaconvnet.onnx
 PLATFORM_PATH=../platforms/${PLATFORM}.toml
 OUTPUT_PATH=${ID}
-CHISEL_PATH=../fpgaconvnet-chisel/data/partitions/$ID/
+CHISEL_PATH=../fpgaconvnet-chisel/data/partitions/$ID
 
 ## make the output directory
 mkdir -p $OUTPUT_PATH
