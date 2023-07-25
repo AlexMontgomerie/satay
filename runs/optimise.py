@@ -30,6 +30,9 @@ fpgaconvnet_parser = Parser()
 net = fpgaconvnet_parser.onnx_to_fpgaconvnet(
         model_path, platform_path)
 
+#for partition in net.partitions:
+#    fpgaconvnet.optimiser.transforms.fine.apply_complete_fine(partition)
+
 # greedy optimiser
 opt = GreedyPartition(net)
 
@@ -44,8 +47,8 @@ for partition in opt.net.partitions:
     partition.enable_wr = False
 
 # apply max fine factor
-for partition in net.partitions:
-    fpgaconvnet.optimiser.transforms.fine.apply_complete_fine(partition)
+#for partition in net.partitions:
+#    fpgaconvnet.optimiser.transforms.fine.apply_complete_fine(partition)
 
 # run optimiser
 opt.run_solver()
