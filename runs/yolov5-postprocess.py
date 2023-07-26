@@ -13,6 +13,13 @@ sim_config_path=f"{output_config_path}/config-chisel-sim.json"
 with open(input_config_path, "r") as f:
     config = json.load(f)
 
+# add the correct outputs
+config["partition"][0]["output_nodes"] = [
+        "/model.24/m.0/Conv_output_0",
+        "/model.24/m.1/Conv_output_0",
+        "/model.24/m.2/Conv_output_0",
+]
+
 # iterate over layers of the network
 for i, layer in enumerate(config["partition"][0]["layers"]):
 
@@ -41,8 +48,9 @@ with open(rsc_config_path, "w") as f:
 for i, layer in enumerate(config["partition"][0]["layers"]):
 
     # increase the depth of the longest paths
-    if layer["name"] in ["Concat_84", "Concat_99", "Concat_127"] :
-        config["partition"][0]["layers"][i]["streams_in"][1]["buffer_depth"] = 300000
+    # if layer["name"] in ["Concat_84", "Concat_99", "Concat_127"] :
+    if layer["type"] == "CONCAT":
+        config["partition"][0]["layers"][i]["streams_in"][1]["buffer_depth"] = 4*config["partition"][0]["layers"][i]["streams_in"][1]["buffer_depth"]
 
 # save the post-processed configuration
 with open(sim_config_path, "w") as f:
