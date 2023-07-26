@@ -24,6 +24,14 @@ for i, layer in enumerate(config["partition"][0]["layers"]):
     if layer.get("use_uram", False):
         config["partition"][0]["layers"][i]["parameters"]["weghts_ram_style"] = "ultra"
 
+# add the correct outputs
+config["partition"][0]["output_nodes"] = [
+        "/model.33/m.0/Conv_output_0",
+        "/model.33/m.1/Conv_output_0",
+        "/model.33/m.2/Conv_output_0",
+        "/model.33/m.3/Conv_output_0"
+]
+
 # save the post-processed configuration
 with open(rsc_config_path, "w") as f:
     json.dump(config, f)
