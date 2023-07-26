@@ -127,4 +127,3 @@
 ./run_model.sh -f=yolov8 -v=m -s=320 -p=vcu118
 ./run_model.sh -f=yolov8 -v=m -s=640 -p=vcu118
 
-

@@ -31,15 +31,6 @@ for i, layer in enumerate(config["partition"][0]["layers"]):
     if layer.get("use_uram", False):
         config["partition"][0]["layers"][i]["parameters"]["weghts_ram_style"] = "ultra"
 
-    # # set no depth for the longest paths
-    # if layer["name"] == "Concat_84":
-    #     config["partition"][0]["layers"][i]["streams_in"][1]["buffer_depth"] = 0
-    # if layer["name"] == "Concat_99":
-    #     config["partition"][0]["layers"][i]["streams_in"][1]["buffer_depth"] = 0
-    # if layer["name"] == "Concat_127":
-    #     config["partition"][0]["layers"][i]["streams_in"][1]["buffer_depth"] = 0
-
-
 # save the post-processed configuration
 with open(rsc_config_path, "w") as f:
     json.dump(config, f)

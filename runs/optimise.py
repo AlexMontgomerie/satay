@@ -47,8 +47,11 @@ for partition in opt.net.partitions:
     partition.enable_wr = False
 
 # apply max fine factor
-#for partition in net.partitions:
-#    fpgaconvnet.optimiser.transforms.fine.apply_complete_fine(partition)
+for partition in net.partitions:
+    fpgaconvnet.optimiser.transforms.fine.apply_complete_fine(partition)
+
+# update network
+opt.net.update_partitions()
 
 # run optimiser
 opt.run_solver()

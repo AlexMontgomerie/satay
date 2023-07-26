@@ -1,3 +1,4 @@
 **.onnx
 
 runs/**/opt/
+runs/yolo*/
