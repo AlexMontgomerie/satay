@@ -48,8 +48,8 @@ if plot_generation in ["yolo_comparison", "all"]:
         # TODO: Add here the filtering for the FPGA results following the same pattern as above
 
         fig, ax = plt.subplots()
-        sns.lineplot(data=cpu_gpu_arm_df, x='Inf. Time (ms)', y='mAP50-95 @ coco128', ax=ax, hue='Model Family-Input Shape', style='Platform', markers=['o', 's'],  dashes=False, linewidth=2, markersize=10, palette=COLOUR_PALETTE, linestyle='solid')
-        sns.lineplot(data=cpu_gpu_tx2_df, x='Inf. Time (ms)', y='mAP50-95 @ coco128', ax=ax, hue='Model Family-Input Shape', style='Platform', markers=['s', 'o'],  dashes=False, linewidth=2, markersize=10, palette=COLOUR_PALETTE, linestyle='dashed')
+        sns.lineplot(data=cpu_gpu_arm_df, x='Inf. Time (ms)', y='mAP50-95 @ coco128', ax=ax, hue='Model Family-Input Shape', style='Platform', markers=['o', 's'],  dashes=False, linewidth=3, markersize=10, palette=COLOUR_PALETTE, linestyle='solid')
+        sns.lineplot(data=cpu_gpu_tx2_df, x='Inf. Time (ms)', y='mAP50-95 @ coco128', ax=ax, hue='Model Family-Input Shape', style='Platform', markers=['s', 'o'],  dashes=False, linewidth=3, markersize=10, palette=COLOUR_PALETTE, linestyle='dashed')
         # TODO: Add here the plotting for the FPGA results following the same pattern as above
 
         # Add some text for each point in the line
@@ -69,14 +69,17 @@ if plot_generation in ["yolo_comparison", "all"]:
     elif yolo_comparison_version == 2:
 
         # filter based on Input Shape
-        cpu_gpu_df = cpu_gpu_df[cpu_gpu_df['Input Shape'].isin(['640x640'])]
+        cpu_gpu_df = cpu_gpu_df[cpu_gpu_df['Input Shape'].isin(['640x640', '416x416'])]
+
+        # remove rows that are in the yolov3 model family and have 'Input Shape' 640x640
+        cpu_gpu_df = cpu_gpu_df[~((cpu_gpu_df['Model Family'] == 'yolov3') & (cpu_gpu_df['Input Shape'] == '640x640'))]
 
         # filter based on Platform
         cpu_gpu_df = cpu_gpu_df[cpu_gpu_df['Platform'].isin(['ARM Cortex-A72', 'Jetson TX2'])]
         # TODO: Add in the list above the FPGA filtering
 
         fig, ax = plt.subplots()
-        sns.lineplot(data=cpu_gpu_df, x='Inf. Time (ms)', y='mAP50-95 @ coco128', ax=ax, hue='Platform', style='Model Family', markers=['o', 's', 'p'],  dashes=True, linewidth=2, markersize=10, palette=COLOUR_PALETTE, linestyle='solid')
+        sns.lineplot(data=cpu_gpu_df, x='Inf. Time (ms)', y='mAP50-95 @ coco128', ax=ax, hue='Platform', style='Model Family', markers=['o', 's', 'p'],  dashes=True, linewidth=3, markersize=10, palette=COLOUR_PALETTE, linestyle='solid')
 
         # Add some text for each point in the line
         for line in range(0,cpu_gpu_df.shape[0]):
@@ -108,7 +111,10 @@ if plot_generation in ["quantization_comparison", "all"]:
     print(quant_cols)
 
     # filter based on Input Shape
-    quant_df = quant_df[quant_df['Input Shape'].isin(['640x640'])]
+    quant_df = quant_df[quant_df['Input Shape'].isin(['640x640', '416x416'])]
+
+    # remove rows that are in the yolov3 model family and have 'Input Shape' 640x640
+    quant_df = quant_df[~((quant_df['Model Family'] == 'yolov3') & (quant_df['Input Shape'] == '640x640'))]
 
     # get the Model Families
     model_families = quant_df['Model Family'].unique().tolist()
@@ -133,7 +139,7 @@ if plot_generation in ["quantization_comparison", "all"]:
                 curr_ax = fig.add_subplot(gs[0, 2:])
             elif idx == 2:
                 curr_ax = fig.add_subplot(gs[1, 1:3])
-            sns.lineplot(data=curr_df, x='Weights Wordlength', y='mAP50-95 @ coco-val2017\nwith LAYER_BFP', ax=curr_ax, hue='Model Variant', palette=COLOUR_PALETTE, errorbar=errorbar, estimator="mean", err_style='band', linewidth=2, markersize=7, marker='o')
+            sns.lineplot(data=curr_df, x='Weights Wordlength', y='mAP50-95 @ coco-val2017\nwith LAYER_BFP', ax=curr_ax, hue='Model Variant', palette=COLOUR_PALETTE, errorbar=errorbar, estimator="mean", err_style='band', linewidth=3, markersize=7, marker='o')
 
             # Make the title bold
             curr_ax.set_title(model_family, fontsize=FONT_SIZE_TITLE)
@@ -165,7 +171,7 @@ if plot_generation in ["quantization_comparison", "all"]:
 
             # errorbar = 'ci' or 'pi' or 'sd' or 'se'
             errorbar = lambda x: (x.min(), x.max())
-            sns.lineplot(data=curr_df, x='Weights Wordlength', y='mAP50-95 @ coco-val2017\nwith LAYER_BFP', ax=ax, hue='Model Variant', palette=COLOUR_PALETTE, errorbar=errorbar, estimator="mean", err_style='band', linewidth=2, markersize=7, marker='o')
+            sns.lineplot(data=curr_df, x='Weights Wordlength', y='mAP50-95 @ coco-val2017\nwith LAYER_BFP', ax=ax, hue='Model Variant', palette=COLOUR_PALETTE, errorbar=errorbar, estimator="mean", err_style='band', linewidth=3, markersize=7, marker='o')
 
             ax.set_xlabel('Weights Wordlength', fontsize=FONT_SIZE_LABELS)
             ax.set_ylabel('mAP50-95', fontsize=FONT_SIZE_LABELS)
