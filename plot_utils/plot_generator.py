@@ -19,7 +19,7 @@ plt.style.use(["science", "grid"])
 plt.rcParams["figure.figsize"] = (FIG_SIZE_X, FIG_SIZE_Y)
 
 # plot generation can be "yolo_comparison" or "quantization_comparison" or "all"
-plot_generation = "quantization_comparison"
+plot_generation = "all"
 assert plot_generation in ["yolo_comparison", "quantization_comparison", "all"], "plot_generation must be one of 'yolo_comparison', 'quantization_comparison' or 'all'"
 
 # you can choose the version of the yolo_comparison plot to generate (available versions are 1 and 2)
@@ -114,7 +114,7 @@ if plot_generation in ["quantization_comparison", "all"]:
     model_families = quant_df['Model Family'].unique().tolist()
 
     if quantization_comparison_version == "combined":
-
+        #TODO: There is an issue with the final (yolov8) plot for this one. The mAP seems to be wrong
         FONT_SIZE_TICKS = 15
         FONT_SIZE_LABELS = 22
         FONT_SIZE_TITLE = 20
@@ -137,7 +137,7 @@ if plot_generation in ["quantization_comparison", "all"]:
 
             # Make the title bold
             curr_ax.set_title(model_family, fontsize=FONT_SIZE_TITLE)
-            curr_ax.set_xlabel('Weights Wordlenght', fontsize=FONT_SIZE_LABELS)
+            curr_ax.set_xlabel('Weights Wordlength', fontsize=FONT_SIZE_LABELS)
             curr_ax.set_ylabel('mAP50-95', fontsize=FONT_SIZE_LABELS)
             # curr_ax.set_yscale('log')
             handles, labels = curr_ax.get_legend_handles_labels()
@@ -167,7 +167,7 @@ if plot_generation in ["quantization_comparison", "all"]:
             errorbar = lambda x: (x.min(), x.max())
             sns.lineplot(data=curr_df, x='Weights Wordlength', y='mAP50-95 @ coco-val2017\nwith LAYER_BFP', ax=ax, hue='Model Variant', palette=COLOUR_PALETTE, errorbar=errorbar, estimator="mean", err_style='band', linewidth=2, markersize=7, marker='o')
 
-            ax.set_xlabel('Weights Wordlenght', fontsize=FONT_SIZE_LABELS)
+            ax.set_xlabel('Weights Wordlength', fontsize=FONT_SIZE_LABELS)
             ax.set_ylabel('mAP50-95', fontsize=FONT_SIZE_LABELS)
             # ax.set_yscale('log')
             handles, labels = ax.get_legend_handles_labels()
