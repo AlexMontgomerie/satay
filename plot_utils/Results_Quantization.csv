@@ -6,6 +6,11 @@ yolov3-tiny,yolov3,tiny,1,320x320,10,16,0.163,0.163
 yolov3-tiny,yolov3,tiny,1,320x320,8,16,0.158,0.161
 yolov3-tiny,yolov3,tiny,1,320x320,7,16,0.143,0.158
 yolov3-tiny,yolov3,tiny,1,320x320,6,16,0.1,0.152
+yolov3-tiny,yolov3,tiny,1,416x416,16,16,0.184,0.184
+yolov3-tiny,yolov3,tiny,1,416x416,10,16,0.183,0.184
+yolov3-tiny,yolov3,tiny,1,416x416,8,16,0.178,0.182
+yolov3-tiny,yolov3,tiny,1,416x416,7,16,0.161,0.179
+yolov3-tiny,yolov3,tiny,1,416x416,6,16,0.111,0.171
 yolov3-tiny,yolov3,tiny,1,640x640,16,16,0.186,0.186
 yolov3-tiny,yolov3,tiny,1,640x640,10,16,0.185,0.186
 yolov3-tiny,yolov3,tiny,1,640x640,8,16,0.179,0.184
