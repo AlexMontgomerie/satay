@@ -1,8 +1,9 @@
 import json
+import sys
 import pandas as pd
 
 # get the configuration path
-config_path = "config-opt.json"
+config_path = sys.argv[1]
 
 # open the config
 with open(config_path, "r") as f:
@@ -34,4 +35,7 @@ buffer_depths = list(reversed(sorted(buffer_depths, key=lambda x : x[1])))
 # save to CSV
 df = pd.DataFrame(buffer_depths)
 df.to_csv(config_path+".csv", index=False, header=False)
+
+# print some statistics
+print(f"Total Buffer Size (MB): {sum([x[1] for x in buffer_depths[3:]])*2/1000000}")
 
