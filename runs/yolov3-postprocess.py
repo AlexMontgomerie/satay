@@ -30,6 +30,10 @@ OFF_CHIP_BUFFERS=["Concat_28"]
 # iterate over layers of the network
 for i, layer in enumerate(config["partition"][0]["layers"]):
 
+    # fix an issue with pooling stream connection
+    if layer["name"] == "MaxPool_18":
+        config["partition"][0]["layers"][i]["streams_in"][0]["node"] = "HardSwish_16"
+
     # fix resize nodes to have correct scaling
     if layer["type"] == "RESIZE":
         config["partition"][0]["layers"][i]["parameters"]["scale"] = [2, 2, 1]
