@@ -13,6 +13,25 @@ sim_config_path=f"{output_config_path}/config-chisel-sim.json"
 with open(input_config_path, "r") as f:
     config = json.load(f)
 
+## correct input and output nodes
+config["partition"][0]["input_nodes"] = [
+        "images",
+        "/model.6/cv2/act/Mul_output_0",
+        "/model.4/cv2/act/Mul_output_0",
+        "/model.9/cv2/act/Mul_output_0",
+    ]
+config["partition"][0]["output_nodes"] = [
+        "/model.4/cv2/act/Mul_output_0",
+        "/model.6/cv2/act/Mul_output_0",
+        "/model.9/cv2/act/Mul_output_0",
+        "/model.22/Concat_output_0",
+        "/model.22/Concat_1_output_0",
+        "/model.22/Concat_2_output_0",
+    ]
+
+# buffers to remove from the hardware graph
+OFF_CHIP_BUFFERS=["Concat_73", "Concat_85", "Concat_111"]
+
 # iterate over layers of the network
 for i, layer in enumerate(config["partition"][0]["layers"]):
 
@@ -24,12 +43,16 @@ for i, layer in enumerate(config["partition"][0]["layers"]):
     if layer.get("use_uram", False):
         config["partition"][0]["layers"][i]["parameters"]["weghts_ram_style"] = "ultra"
 
-# add the correct outputs
-config["partition"][0]["output_nodes"] = [
-        "/model.22/Concat_output_0",
-        "/model.22/Concat_1_output_0",
-        "/model.22/Concat_2_output_0"
-]
+    # remove concat connections to long buffer connections
+    if layer["name"] in OFF_CHIP_BUFFERS:
+        config["partition"][0]["layers"][i]["streams_in"][1]["buffer_depth"] = 64
+        config["partition"][0]["layers"][i]["streams_in"][1]["node"] = config["partition"][0]["layers"][i]["name"]
+
+    # remove split connections to long buffer connections
+    if layer["type"] == "SPLIT":
+        for j, stream_out in enumerate(config["partition"][0]["layers"][i]["streams_out"]):
+            if stream_out["node"] in OFF_CHIP_BUFFERS:
+                config["partition"][0]["layers"][i]["streams_out"][j]["node"] = layer["name"]
 
 # save the post-processed configuration
 with open(rsc_config_path, "w") as f:
@@ -39,8 +62,9 @@ with open(rsc_config_path, "w") as f:
 for i, layer in enumerate(config["partition"][0]["layers"]):
 
     # increase the depth of the longest paths
-    if layer["name"] in ["Concat_73", "Concat_85", "Concat_111"] :
-        config["partition"][0]["layers"][i]["streams_in"][1]["buffer_depth"] = 300000
+    if layer["type"] == "CONCAT":
+        config["partition"][0]["layers"][i]["streams_in"][1]["buffer_depth"] = \
+                4*config["partition"][0]["layers"][i]["streams_in"][1]["buffer_depth"]
 
 # save the post-processed configuration
 with open(sim_config_path, "w") as f:
