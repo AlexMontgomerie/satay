@@ -37,5 +37,5 @@ df = pd.DataFrame(buffer_depths)
 df.to_csv(config_path+".csv", index=False, header=False)
 
 # print some statistics
-print(f"Total Buffer Size (MB): {sum([x[1] for x in buffer_depths[3:]])*2/1000000}")
+print(f"Total Buffer Size (MB): {sum([x[1] for x in buffer_depths])*2/1000000}")
 
