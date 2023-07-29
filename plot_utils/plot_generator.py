@@ -75,7 +75,7 @@ if plot_generation in ["yolo_comparison", "all"]:
         cpu_gpu_df = cpu_gpu_df[~((cpu_gpu_df['Model Family'] == 'yolov3') & (cpu_gpu_df['Input Shape'] == '640x640'))]
 
         # filter based on Platform
-        cpu_gpu_df = cpu_gpu_df[cpu_gpu_df['Platform'].isin(['ARM Cortex-A72', 'Jetson TX2'])]
+        cpu_gpu_df = cpu_gpu_df[cpu_gpu_df['Platform'].isin(['ARM Cortex-A72', 'Jetson TX2', 'Alveo U250'])]
         # TODO: Add in the list above the FPGA filtering
 
         fig, ax = plt.subplots()
@@ -90,9 +90,9 @@ if plot_generation in ["yolo_comparison", "all"]:
         ax.set_ylabel('mAP50-95', fontsize=FONT_SIZE_LABELS)
         ax.set_xscale('log')
         handles, labels = ax.get_legend_handles_labels()
-        handles = handles[1:3] + handles[4:]
-        labels = labels[1:3] + labels[4:]
-        order = [0, 2, 1, 3, 4]
+        handles = handles[1:4] + handles[5:]
+        labels = labels[1:4] + labels[5:]
+        order = [0, 3, 1, 4, 2, 5]
         handles = [handles[idx] for idx in order]
         labels = [labels[idx] for idx in order]
         ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 1.155), ncol=3, fontsize=FONT_SIZE_LEGEND, frameon=False)
