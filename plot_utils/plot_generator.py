@@ -20,7 +20,7 @@ plt.rcParams["figure.figsize"] = (FIG_SIZE_X, FIG_SIZE_Y)
 
 # plot generation can be "yolo_comparison" or "quantization_comparison" or "all"
 plot_generation = "all"
-assert plot_generation in ["yolo_comparison", "quantization_comparison", "all"], "plot_generation must be one of 'yolo_comparison', 'quantization_comparison' or 'all'"
+assert plot_generation in ["yolo_comparison", "quantization_comparison", "buffer_depths", "all"], "plot_generation must be one of 'yolo_comparison', 'quantization_comparison', 'buffer_depths', or 'all'"
 
 # you can choose the version of the yolo_comparison plot to generate (available versions are 1 and 2)
 yolo_comparison_version = 2
@@ -75,7 +75,7 @@ if plot_generation in ["yolo_comparison", "all"]:
         cpu_gpu_df = cpu_gpu_df[~((cpu_gpu_df['Model Family'] == 'yolov3') & (cpu_gpu_df['Input Shape'] == '640x640'))]
 
         # filter based on Platform
-        cpu_gpu_df = cpu_gpu_df[cpu_gpu_df['Platform'].isin(['ARM Cortex-A72', 'Jetson TX2'])]
+        cpu_gpu_df = cpu_gpu_df[cpu_gpu_df['Platform'].isin(['ARM Cortex-A72', 'Jetson TX2', 'Alveo U250'])]
         # TODO: Add in the list above the FPGA filtering
 
         fig, ax = plt.subplots()
@@ -90,9 +90,9 @@ if plot_generation in ["yolo_comparison", "all"]:
         ax.set_ylabel('mAP50-95', fontsize=FONT_SIZE_LABELS)
         ax.set_xscale('log')
         handles, labels = ax.get_legend_handles_labels()
-        handles = handles[1:3] + handles[4:]
-        labels = labels[1:3] + labels[4:]
-        order = [0, 2, 1, 3, 4]
+        handles = handles[1:4] + handles[5:]
+        labels = labels[1:4] + labels[5:]
+        order = [0, 3, 1, 4, 2, 5]
         handles = [handles[idx] for idx in order]
         labels = [labels[idx] for idx in order]
         ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 1.155), ncol=3, fontsize=FONT_SIZE_LEGEND, frameon=False)
@@ -101,7 +101,7 @@ if plot_generation in ["yolo_comparison", "all"]:
     ax.set_xticklabels(ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS)
     ax.set_yticklabels(ax.get_yticklabels(), fontsize=FONT_SIZE_TICKS)
 
-    plt.tight_layout()
+    # plt.tight_layout()
     # plt.savefig(f'yolo_comparison_devices_v{yolo_comparison_version}.png', bbox_inches='tight')
     plt.savefig('yolo_comparison_devices.pdf', bbox_inches='tight', format='pdf')
 
@@ -152,7 +152,7 @@ if plot_generation in ["quantization_comparison", "all"]:
             curr_ax.set_xticklabels(curr_ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS)
             curr_ax.set_yticklabels(curr_ax.get_yticklabels(), fontsize=FONT_SIZE_TICKS)
 
-        plt.tight_layout()
+        # plt.tight_layout()
         # plt.savefig('quant_comparison_devices_combined.png', bbox_inches='tight')
         plt.savefig('quant_comparison_devices_combined.pdf', bbox_inches='tight', format='pdf')
 
@@ -182,6 +182,35 @@ if plot_generation in ["quantization_comparison", "all"]:
             ax.set_xticklabels(ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS)
             ax.set_yticklabels(ax.get_yticklabels(), fontsize=FONT_SIZE_TICKS)
 
-            plt.tight_layout()
+            # plt.tight_layout()
             # plt.savefig(f'quant_comparison_devices_{model_family}.png', bbox_inches='tight')
             plt.savefig(f'quant_comparison_devices_{model_family}.pdf', bbox_inches='tight', format='pdf')
+
+
+if plot_generation in ["buffer_depths", "all"]:
+    FONT_SIZE_TICKS = 17
+    FONT_SIZE_LABELS = 25
+
+    buffer_depths_df = pd.read_csv('Buffer-Depths_yolov5n-640-zcu104.csv')
+    buffer_depths_cols = buffer_depths_df.columns.to_list()
+    print(buffer_depths_cols)
+
+    fig, ax = plt.subplots()
+
+    sns.barplot(x=buffer_depths_df['Buffer'], y=buffer_depths_df['Buffer Size (KB)'], color=(0.702, 0.698, 0.984), edgecolor=(0.106, 0.062, 0.972), ax=ax, dodge=False)
+
+    ax.set_xlabel('Buffers', fontsize=FONT_SIZE_LABELS)
+    ax.set_ylabel('Buffer Size (KB)', fontsize=FONT_SIZE_LABELS)
+
+    ax.set_xticklabels([])
+    # ax.set_xticklabels(ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS - 7, rotation=90)
+    ax.set_yticklabels(ax.get_yticklabels(), fontsize=FONT_SIZE_TICKS)
+
+    # add extra space before the first tick and after the last tick
+    ax.relim()
+    # ax.autoscale_view()
+    ax.margins(x=0.015)
+
+    # plt.tight_layout()
+    # plt.savefig('buffer_depths.png', bbox_inches='tight')
+    plt.savefig('buffer_depths.pdf', bbox_inches='tight', format='pdf')
