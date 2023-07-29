@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import scienceplots
 import seaborn as sns
+import numpy as np
 
 FIG_SIZE_X = 10
 FIG_SIZE_Y = 6
@@ -19,8 +20,8 @@ plt.style.use(["science", "grid"])
 plt.rcParams["figure.figsize"] = (FIG_SIZE_X, FIG_SIZE_Y)
 
 # plot generation can be "yolo_comparison" or "quantization_comparison" or "all"
-plot_generation = "energy_comparison"
-assert plot_generation in ["yolo_comparison", "quantization_comparison", "buffer_depths", "energy_comparison", "all"], "plot_generation must be one of 'yolo_comparison', 'quantization_comparison', 'buffer_depths', 'energy_comparison', or 'all'"
+plot_generation = "ablation"
+assert plot_generation in ["ablation", "yolo_comparison", "quantization_comparison", "buffer_depths", "energy_comparison", "all"], "plot_generation must be one of 'yolo_comparison', 'quantization_comparison', 'buffer_depths', 'energy_comparison', or 'all'"
 
 # you can choose the version of the yolo_comparison plot to generate (available versions are 1 and 2)
 yolo_comparison_version = 2
@@ -264,3 +265,99 @@ if plot_generation in ["energy_comparison", "all"]:
         # plt.tight_layout()
         # plt.savefig('energy_comparison_scatter.png', bbox_inches='tight')
         plt.savefig('energy_comparison.pdf', bbox_inches='tight', format='pdf')
+
+if plot_generation in ["ablation", "all"]:
+
+
+
+    buffer_size = np.array([ 1217.438, 919.428, 764.088, 638.008, 588.508, 534.508])
+    buffer_bw   = np.cumsum([ 0, 0.455, 0.228, 0.057, 0.028, 0.028 ])
+    buffer_lutram = np.array([ 136688, 97708, 77064, 61368, 56368, 51248])
+
+    print(buffer_bw)
+
+    sliding_window_size = 726.24
+    weights_size = 1982
+
+    io_bw = 1.365
+
+    num_points = len(buffer_size)
+
+
+    FONT_SIZE_TICKS = 20
+    FONT_SIZE_LEGEND = 16
+    FIG_HEIGHT=4
+    FIG_WIDTH=8
+
+    """
+    Buffer Size Plot
+    """
+
+    fig, ax = plt.subplots(figsize=(FIG_WIDTH, FIG_HEIGHT))
+
+    buffer_size_bar_plot = pd.DataFrame({
+        "Weights" : [weights_size]*num_points,
+        "Sliding Window" : [sliding_window_size]*num_points,
+        "Buffers" : buffer_size,
+    })
+
+    buffer_size_bar_plot.plot(kind="bar", stacked=True, ax=ax)
+
+    ax.set_xlabel('', fontsize=FONT_SIZE_LABELS)
+    ax.set_ylabel('On-Chip Memory (KB)', fontsize=FONT_SIZE_LABELS)
+
+    ax.set_xticklabels(ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS)
+    ax.set_yticklabels(ax.get_yticklabels(), fontsize=FONT_SIZE_TICKS)
+
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=4,
+              fontsize=FONT_SIZE_LEGEND, frameon=False, markerscale=3)
+
+    plt.savefig('ablation-buffer-size.pdf', bbox_inches='tight', format='pdf')
+
+    """
+    Bandwidth Plot
+    """
+
+    fig, ax = plt.subplots(figsize=(FIG_WIDTH, FIG_HEIGHT))
+
+    bandwidth_bar_plot = pd.DataFrame({
+        "IO" : [io_bw]*num_points,
+        "Buffers" : buffer_bw,
+    })
+
+    bandwidth_bar_plot.plot(kind="bar", stacked=True, ax=ax)
+
+    ax.set_xlabel('', fontsize=FONT_SIZE_LABELS)
+    ax.set_ylabel('Off-Chip Memory Bandwidth (Gbps)', fontsize=FONT_SIZE_LABELS)
+
+    ax.set_xticklabels(ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS)
+    ax.set_yticklabels(ax.get_yticklabels(), fontsize=FONT_SIZE_TICKS)
+
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=4,
+              fontsize=FONT_SIZE_LEGEND, frameon=False, markerscale=3)
+
+    plt.savefig('ablation-buffer-bw.pdf', bbox_inches='tight', format='pdf')
+
+    """
+    LUTRAM Plot
+    """
+
+    fig, ax = plt.subplots(figsize=(FIG_WIDTH, FIG_HEIGHT))
+
+    lutram_bar_plot = pd.DataFrame({
+        "lutram" : buffer_lutram,
+    })
+
+    lutram_bar_plot.plot(kind="bar", stacked=True, ax=ax, legend=False)
+
+    ax.set_xlabel('', fontsize=FONT_SIZE_LABELS)
+    ax.set_ylabel('LUTRAM', fontsize=FONT_SIZE_LABELS)
+
+    ax.hlines(y=[101760], xmin=-1, xmax=6, colors='red', linestyles='--', lw=2)
+
+    ax.set_xticklabels(ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS)
+    ax.set_yticklabels(ax.get_yticklabels(), fontsize=FONT_SIZE_TICKS)
+
+    plt.savefig('ablation-lutram.pdf', bbox_inches='tight', format='pdf')
+
+
