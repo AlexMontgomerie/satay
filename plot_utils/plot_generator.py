@@ -19,12 +19,16 @@ plt.style.use(["science", "grid"])
 plt.rcParams["figure.figsize"] = (FIG_SIZE_X, FIG_SIZE_Y)
 
 # plot generation can be "yolo_comparison" or "quantization_comparison" or "all"
-plot_generation = "all"
-assert plot_generation in ["yolo_comparison", "quantization_comparison", "buffer_depths", "all"], "plot_generation must be one of 'yolo_comparison', 'quantization_comparison', 'buffer_depths', or 'all'"
+plot_generation = "energy_comparison"
+assert plot_generation in ["yolo_comparison", "quantization_comparison", "buffer_depths", "energy_comparison", "all"], "plot_generation must be one of 'yolo_comparison', 'quantization_comparison', 'buffer_depths', 'energy_comparison', or 'all'"
 
 # you can choose the version of the yolo_comparison plot to generate (available versions are 1 and 2)
 yolo_comparison_version = 2
 assert yolo_comparison_version in [1, 2], "yolo_comparison_version must be one of 1 or 2"
+
+# you can choose the version of the energy_comparison plot to generate (available versions are 1 and 2)
+energy_comparison_plot_type = 'bar'
+assert energy_comparison_plot_type in ['bar', 'scatter'], "energy_comparison_plot_type must be one of 'bar' or 'scatter'"
 
 # you can choose the version of the quantization_comparison plot to generate (available versions are "combined" and "separate")
 quantization_comparison_version = "separate"
@@ -214,3 +218,49 @@ if plot_generation in ["buffer_depths", "all"]:
     # plt.tight_layout()
     # plt.savefig('buffer_depths.png', bbox_inches='tight')
     plt.savefig('buffer_depths.pdf', bbox_inches='tight', format='pdf')
+
+if plot_generation in ["energy_comparison", "all"]:
+    energy_df = pd.read_csv('Energy_Comparison.csv')
+    energy_cols = energy_df.columns.to_list()
+    print(energy_cols)
+
+    fig, ax = plt.subplots()
+
+    if energy_comparison_plot_type == 'bar':
+        FONT_SIZE_TICKS = 20
+        FONT_SIZE_LEGEND = 16
+
+        sns.barplot(x=energy_df['Device'], y=energy_df['Energy (mJ)'], hue=energy_df['Input Shape'], ax=ax, width=0.7, edgecolor='black', palette=COLOUR_PALETTE)
+        # sns.barplot(x=energy_df['Input Shape'], y=energy_df['Energy (mJ)'], hue=energy_df['Device'], ax=ax, width=0.7, edgecolor='black', palette=COLOUR_PALETTE)
+
+        ax.set_xlabel('', fontsize=FONT_SIZE_LABELS)
+        ax.set_ylabel('Energy (mJ)', fontsize=FONT_SIZE_LABELS)
+
+        ax.set_xticklabels(ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS)
+        ax.set_yticklabels(ax.get_yticklabels(), fontsize=FONT_SIZE_TICKS)
+
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=4, fontsize=FONT_SIZE_LEGEND, frameon=False, markerscale=3)
+
+        # plt.tight_layout()
+        # plt.savefig('energy_comparison_barplot.png', bbox_inches='tight')
+        plt.savefig('energy_comparison.pdf', bbox_inches='tight', format='pdf')
+
+    elif energy_comparison_plot_type == 'scatter':
+
+        sns.scatterplot(data=energy_df, x='Latency (ms)', y='Energy (mJ)', hue='Device', size='Input Shape', sizes=(300, 150), ax=ax, palette=COLOUR_PALETTE)
+
+        ax.set_xlabel('Latency (ms)', fontsize=FONT_SIZE_LABELS)
+        ax.set_ylabel('Energy (mJ)', fontsize=FONT_SIZE_LABELS)
+
+        ax.set_xticklabels(ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS)
+        ax.set_yticklabels(ax.get_yticklabels(), fontsize=FONT_SIZE_TICKS)
+
+        handles, labels = ax.get_legend_handles_labels()
+        handles = handles[1:]
+        labels = labels[1:]
+        labels[5] = ''
+        ax.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=4, fontsize=FONT_SIZE_LEGEND, frameon=False)
+
+        # plt.tight_layout()
+        # plt.savefig('energy_comparison_scatter.png', bbox_inches='tight')
+        plt.savefig('energy_comparison.pdf', bbox_inches='tight', format='pdf')
