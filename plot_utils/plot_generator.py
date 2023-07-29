@@ -1,9 +1,9 @@
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import scienceplots
 import seaborn as sns
-import numpy as np
 
 FIG_SIZE_X = 10
 FIG_SIZE_Y = 6
@@ -20,8 +20,8 @@ plt.style.use(["science", "grid"])
 plt.rcParams["figure.figsize"] = (FIG_SIZE_X, FIG_SIZE_Y)
 
 # plot generation can be "yolo_comparison" or "quantization_comparison" or "all"
-plot_generation = "ablation"
-assert plot_generation in ["ablation", "yolo_comparison", "quantization_comparison", "buffer_depths", "energy_comparison", "all"], "plot_generation must be one of 'yolo_comparison', 'quantization_comparison', 'buffer_depths', 'energy_comparison', or 'all'"
+plot_generation = "pareto"
+assert plot_generation in ["pareto", "ablation", "yolo_comparison", "quantization_comparison", "buffer_depths", "energy_comparison", "all"], "plot_generation must be one of 'pareto', 'ablation', 'yolo_comparison', 'quantization_comparison', 'buffer_depths', 'energy_comparison', or 'all'"
 
 # you can choose the version of the yolo_comparison plot to generate (available versions are 1 and 2)
 yolo_comparison_version = 2
@@ -34,6 +34,29 @@ assert energy_comparison_plot_type in ['bar', 'scatter'], "energy_comparison_plo
 # you can choose the version of the quantization_comparison plot to generate (available versions are "combined" and "separate")
 quantization_comparison_version = "separate"
 assert quantization_comparison_version in ["combined", "separate"], "quantization_comparison_version must be one of 'combined' or 'separate'"
+
+def pareto_frontier(Xs, Ys, maxX = True, maxY = True):
+    myList = sorted([[Xs[i], Ys[i]] for i in range(len(Xs))], reverse=maxX)
+    p_front = [myList[0]]
+    for pair in myList[1:]:
+        if maxY:
+            if pair[1] >= p_front[-1][1]:
+                p_front.append(pair)
+        else:
+            if pair[1] <= p_front[-1][1]:
+                p_front.append(pair)
+    p_front = np.array(p_front)
+
+    p_front_fixed = []
+    for i, pair in enumerate(p_front):
+        if i > 0:
+            if pair[1] != p_front[i-1][1]:
+                new_point = [pair[0], p_front[i-1][1]]
+                p_front_fixed.append(new_point)
+        p_front_fixed.append(pair)
+    p_front_fixed = np.array(p_front_fixed)
+
+    return p_front_fixed[:,0], p_front_fixed[:,1]
 
 if plot_generation in ["yolo_comparison", "all"]:
     cpu_gpu_df = pd.read_csv('Results_CPU_and_GPU.csv')
@@ -202,7 +225,18 @@ if plot_generation in ["buffer_depths", "all"]:
 
     fig, ax = plt.subplots()
 
-    sns.barplot(x=buffer_depths_df['Buffer'], y=buffer_depths_df['Buffer Size (KB)'], color=(0.702, 0.698, 0.984), edgecolor=(0.106, 0.062, 0.972), ax=ax, dodge=False)
+    # filter the off-chip buffers (first three rows)
+    buffer_depths_df_off_chip = buffer_depths_df.iloc[:3]
+
+    # filter the on-chip buffers (remaining rows)
+    buffer_depths_df_on_chip = buffer_depths_df.iloc[3:]
+    # add three empty rows at the start of the on-chip dataframe
+    buffer_depths_df_on_chip = pd.concat([pd.DataFrame(np.zeros((3, 4)), columns=buffer_depths_cols), buffer_depths_df_on_chip], ignore_index=True)
+    buffer_depths_df_on_chip.iloc[:3]['Buffer'].update(['a', 'b', 'c'])
+
+    sns.barplot(x=buffer_depths_df_off_chip['Buffer'], y=buffer_depths_df_off_chip['Buffer Size (KB)'], fill=False, edgecolor=(0.106, 0.062, 0.972), linewidth=3, ax=ax, dodge=False)
+
+    sns.barplot(x=buffer_depths_df_on_chip['Buffer'], y=buffer_depths_df_on_chip['Buffer Size (KB)'], color=(0.702, 0.698, 0.984), edgecolor=(0.106, 0.062, 0.972), linewidth=2, ax=ax, dodge=False)
 
     ax.set_xlabel('Buffers', fontsize=FONT_SIZE_LABELS)
     ax.set_ylabel('Buffer Size (KB)', fontsize=FONT_SIZE_LABELS)
@@ -230,6 +264,7 @@ if plot_generation in ["energy_comparison", "all"]:
     if energy_comparison_plot_type == 'bar':
         FONT_SIZE_TICKS = 20
         FONT_SIZE_LEGEND = 16
+        COLOUR_PALETTE = 'crest'
 
         sns.barplot(x=energy_df['Device'], y=energy_df['Energy (mJ)'], hue=energy_df['Input Shape'], ax=ax, width=0.7, edgecolor='black', palette=COLOUR_PALETTE)
         # sns.barplot(x=energy_df['Input Shape'], y=energy_df['Energy (mJ)'], hue=energy_df['Device'], ax=ax, width=0.7, edgecolor='black', palette=COLOUR_PALETTE)
@@ -268,13 +303,15 @@ if plot_generation in ["energy_comparison", "all"]:
 
 if plot_generation in ["ablation", "all"]:
 
-
+    FONT_SIZE_TICKS = 20
+    FONT_SIZE_LABELS = 27
+    FONT_SIZE_LEGEND = 20
+    FONT_SIZE_TEXT = 15
+    COLOUR_PALETTE = 'cividis'
 
     buffer_size = np.array([ 1217.438, 919.428, 764.088, 638.008, 588.508, 534.508])
     buffer_bw   = np.cumsum([ 0, 0.455, 0.228, 0.057, 0.028, 0.028 ])
     buffer_lutram = np.array([ 136688, 97708, 77064, 61368, 56368, 51248])
-
-    print(buffer_bw)
 
     sliding_window_size = 726.24
     weights_size = 1982
@@ -284,16 +321,11 @@ if plot_generation in ["ablation", "all"]:
     num_points = len(buffer_size)
 
 
-    FONT_SIZE_TICKS = 20
-    FONT_SIZE_LEGEND = 16
-    FIG_HEIGHT=4
-    FIG_WIDTH=8
-
     """
     Buffer Size Plot
     """
 
-    fig, ax = plt.subplots(figsize=(FIG_WIDTH, FIG_HEIGHT))
+    fig, ax = plt.subplots()
 
     buffer_size_bar_plot = pd.DataFrame({
         "Weights" : [weights_size]*num_points,
@@ -301,63 +333,111 @@ if plot_generation in ["ablation", "all"]:
         "Buffers" : buffer_size,
     })
 
-    buffer_size_bar_plot.plot(kind="bar", stacked=True, ax=ax)
+    buffer_size_bar_plot.plot(kind="bar", stacked=True, ax=ax, colormap=COLOUR_PALETTE)
 
     ax.set_xlabel('', fontsize=FONT_SIZE_LABELS)
     ax.set_ylabel('On-Chip Memory (KB)', fontsize=FONT_SIZE_LABELS)
 
-    ax.set_xticklabels(ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS)
+    ax.set_xticklabels(ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS, rotation=0)
     ax.set_yticklabels(ax.get_yticklabels(), fontsize=FONT_SIZE_TICKS)
 
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=4,
               fontsize=FONT_SIZE_LEGEND, frameon=False, markerscale=3)
 
     plt.savefig('ablation-buffer-size.pdf', bbox_inches='tight', format='pdf')
-
+    plt.clf()
     """
     Bandwidth Plot
     """
 
-    fig, ax = plt.subplots(figsize=(FIG_WIDTH, FIG_HEIGHT))
+    fig, ax = plt.subplots()
 
     bandwidth_bar_plot = pd.DataFrame({
         "IO" : [io_bw]*num_points,
         "Buffers" : buffer_bw,
     })
 
-    bandwidth_bar_plot.plot(kind="bar", stacked=True, ax=ax)
+    bandwidth_bar_plot.plot(kind="bar", stacked=True, ax=ax, colormap=COLOUR_PALETTE)
 
     ax.set_xlabel('', fontsize=FONT_SIZE_LABELS)
-    ax.set_ylabel('Off-Chip Memory Bandwidth (Gbps)', fontsize=FONT_SIZE_LABELS)
+    ax.set_ylabel('Off-Chip Memory\nBandwidth (Gbps)', fontsize=FONT_SIZE_LABELS)
 
-    ax.set_xticklabels(ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS)
+    ax.set_xticklabels(ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS, rotation=0)
     ax.set_yticklabels(ax.get_yticklabels(), fontsize=FONT_SIZE_TICKS)
 
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=4,
               fontsize=FONT_SIZE_LEGEND, frameon=False, markerscale=3)
 
     plt.savefig('ablation-buffer-bw.pdf', bbox_inches='tight', format='pdf')
-
+    plt.clf()
     """
     LUTRAM Plot
     """
 
-    fig, ax = plt.subplots(figsize=(FIG_WIDTH, FIG_HEIGHT))
+    fig, ax = plt.subplots()
 
     lutram_bar_plot = pd.DataFrame({
         "lutram" : buffer_lutram,
     })
 
-    lutram_bar_plot.plot(kind="bar", stacked=True, ax=ax, legend=False)
+    lutram_bar_plot.plot(kind="bar", stacked=True, ax=ax, legend=False, colormap=COLOUR_PALETTE)
 
     ax.set_xlabel('', fontsize=FONT_SIZE_LABELS)
     ax.set_ylabel('LUTRAM', fontsize=FONT_SIZE_LABELS)
 
     ax.hlines(y=[101760], xmin=-1, xmax=6, colors='red', linestyles='--', lw=2)
 
-    ax.set_xticklabels(ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS)
+    ax.set_xticklabels(ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS, rotation=0)
     ax.set_yticklabels(ax.get_yticklabels(), fontsize=FONT_SIZE_TICKS)
 
     plt.savefig('ablation-lutram.pdf', bbox_inches='tight', format='pdf')
 
 
+if plot_generation in ["pareto", "all"]:
+    FONT_SIZE_TICKS = 18
+    FONT_SIZE_LABELS = 22
+    FONT_SIZE_LEGEND = 13
+    FONT_SIZE_TEXT = 15
+
+    pareto_df = pd.read_csv('Pareto_Evaluation.csv').set_index('Work').T
+    pareto_cols = pareto_df.columns.to_list()
+    print(pareto_cols)
+
+    works = pareto_df.index.values.tolist()
+    for idx in range(len(works)):
+        if '.' in works[idx]:
+            works[idx] = works[idx].split('.')[0]
+
+    for col in pareto_cols[1:]:
+        pareto_df[col] = pareto_df[col].astype(float)
+
+    # drop row with index 'Nguyen (2020)'
+    pareto_df = pareto_df.drop('Nguyen (2020)')
+
+    fig, ax = plt.subplots()
+
+    sns.scatterplot(data=pareto_df, x='GOP/s/DSP', y='mAP50 (\%)', hue='Model', s=200, ax=ax, palette=COLOUR_PALETTE)
+
+    # Add the work name as text for each point in the scatter plot
+    for line in range(0, pareto_df.shape[0]):
+        curr_series = pareto_df.iloc[line]
+        work_name = works[line]
+        if 'Pestana' in work_name:
+            ax.text(curr_series['GOP/s/DSP'], curr_series['mAP50 (\%)'], work_name, ha='left', va='bottom', size=FONT_SIZE_TEXT, color='black', weight='bold')
+        elif 'Herrman' in work_name:
+            ax.text(curr_series['GOP/s/DSP'], curr_series['mAP50 (\%)'], work_name, ha='center', va='top', size=FONT_SIZE_TEXT, color='black', weight='bold')
+        else:
+            ax.text(curr_series['GOP/s/DSP'], curr_series['mAP50 (\%)'], work_name, ha='center', va='bottom', size=FONT_SIZE_TEXT, color='black', weight='bold')
+
+    x_pareto, y_pareto = pareto_frontier(pareto_df['GOP/s/DSP'].values, pareto_df['mAP50 (\%)'].values, maxX=True, maxY=True)
+    ax.plot(x_pareto, y_pareto, color='red', linewidth=2, linestyle='--')
+
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=3, fontsize=FONT_SIZE_LEGEND, frameon=False, markerscale=1.5)
+
+    ax.set_xticklabels(ax.get_xticklabels(), fontsize=FONT_SIZE_TICKS)
+    ax.set_yticklabels(ax.get_yticklabels(), fontsize=FONT_SIZE_TICKS)
+
+    ax.set_xlabel('GOP/s/DSP', fontsize=FONT_SIZE_LABELS)
+    ax.set_ylabel('mAP @ 50 (\%)', fontsize=FONT_SIZE_LABELS)
+
+    plt.savefig('pareto.pdf', bbox_inches='tight', format='pdf')
