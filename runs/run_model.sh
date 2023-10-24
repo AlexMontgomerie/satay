@@ -38,27 +38,16 @@ MODEL_PATH=../onnx_models/${FAMILY}/${MODEL_NAME}.onnx
 FPGACONVNET_MODEL_PATH=../onnx_models/${FAMILY}/${MODEL_NAME}-fpgaconvnet.onnx
 PLATFORM_PATH=../platforms/${PLATFORM}.toml
 OUTPUT_PATH=${ID}
-CHISEL_PATH=../fpgaconvnet-chisel/data/partitions/$ID
 
 ## make the output directory
 mkdir -p $OUTPUT_PATH
 
 ## perform preprocessing
-# python ${FAMILY}${VARIANT}-preprocess.py $MODEL_PATH $FPGACONVNET_MODEL_PATH
 python ${FAMILY}-preprocess.py $MODEL_PATH $FPGACONVNET_MODEL_PATH $SIZE
 
 ## optimise the model
 python optimise.py $FPGACONVNET_MODEL_PATH $PLATFORM_PATH $OUTPUT_PATH
 
-## post process the config to make it suitable for chisel
+## post process the config to make it suitable for hardware generation
 python ${FAMILY}-postprocess.py $OUTPUT_PATH/config.json $OUTPUT_PATH
-
-## copy over to chisel
-mkdir -p ${CHISEL_PATH}-rsc
-cp $OUTPUT_PATH/config-chisel-rsc.json ${CHISEL_PATH}-rsc/partition_info.json
-cp $FPGACONVNET_MODEL_PATH ${CHISEL_PATH}-rsc/model.onnx
-mkdir -p ${CHISEL_PATH}-sim
-cp $OUTPUT_PATH/config-chisel-sim.json ${CHISEL_PATH}-sim/partition_info.json
-cp $FPGACONVNET_MODEL_PATH ${CHISEL_PATH}-sim/model.onnx
-
 

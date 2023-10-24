@@ -1,12 +1,6 @@
-[submodule "taso"]
-	path = taso
-	url = https://www.github.com/jiazhihao/taso
 [submodule "fpgaconvnet-optimiser"]
 	path = fpgaconvnet-optimiser
 	url = git@github.com:AlexMontgomerie/fpgaconvnet-optimiser.git
 [submodule "fpgaconvnet-model"]
 	path = fpgaconvnet-model
 	url = git@github.com:AlexMontgomerie/fpgaconvnet-model.git
-[submodule "fpgaconvnet-chisel"]
-	path = fpgaconvnet-chisel
-	url = git@github.com:AlexMontgomerie/fpgaconvnet-chisel.git
