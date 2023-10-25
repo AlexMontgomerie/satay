@@ -13,7 +13,7 @@ mv uc?id=1XzfKGgpwcQp_ATdt93zx9ZTJXZNW2oib yolov3-tiny_imgsz416_fp16.onnx
 mv uc?id=1lC_LOwVz-WlfL5PG6fQVib8_JqTBZmUE yolov3-tiny_imgsz320_fp16.onnx
 mv uc?id=14lWTELBWpRZYqlNycMJntITYHmb3un7C yolov3-tiny_imgsz640_fp16.onnx
 mv uc?id=1mRkym2dVluYSdV-s_YG4Bw72F6tScZ5I yolov3_imgsz320_fp16.onnx
-mv uc?id=1XYg-THg9t2-Ulo1d2j13Rt6k3KeUMpK8 yolov3_imgsz320_fp16.onnx
+mv uc?id=1XYg-THg9t2-Ulo1d2j13Rt6k3KeUMpK8 yolov3_imgsz640_fp16.onnx
 
 # Create the folder and download YOLOv5 models
 cd ..
