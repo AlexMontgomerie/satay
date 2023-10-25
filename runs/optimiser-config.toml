@@ -1,0 +1,25 @@
+[general]
+logging = false
+checkpoints = false
+starting_point_distillation = false
+resource_allocation = 1.00
+
+[transforms.fine]
+apply_transform = true
+probability = 0.25
+start_complete = true
+
+[transforms.coarse]
+apply_transform = true
+probability = 0.25
+
+[transforms.weights_reloading]
+apply_transform = false
+probability = 0.25
+start_max = false
+
+[transforms.partition]
+apply_transform = false
+probability = 0.1
+start_complete = false
+

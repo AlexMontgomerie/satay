@@ -1,0 +1,21 @@
+[device]
+name = "zcu216"
+part = "xczu49dr-2ffvf1760-2-e"
+board = ""
+
+[resources]
+DSP   = 4272
+BRAM  = 2112
+FF    = 930000
+LUT   = 425000
+URAM  = 78
+
+[system]
+board_frequency = 250 # in MHz
+memory_bandwidth = 100.0 # in Gbps
+reconfiguration_time = 0.08255 # in seconds
+port_width = 512
+
+[ethernet]
+bandwidth = 100.0 # in Gbps
+latency = 0.000005 # in seconds

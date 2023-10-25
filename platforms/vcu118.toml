@@ -1,0 +1,21 @@
+[device]
+name = "vcu118"
+part = "xcvu9p-l2flga2104e-3"
+board = ""
+
+[resources]
+DSP   = 6840
+BRAM  = 4217
+FF    = 2586000
+LUT   = 1182000
+URAM  = 938
+
+[system]
+board_frequency = 250 # in MHz
+memory_bandwidth = 100.0 # in Gbps
+reconfiguration_time = 0.08255 # in seconds
+port_width = 512
+
+[ethernet]
+bandwidth = 100.0 # in Gbps
+latency = 0.000005 # in seconds

@@ -1,0 +1,8 @@
+**.onnx
+
+results/
+
+runs/**/opt/
+runs/yolo*/
+
+plot_utils/*.pdf

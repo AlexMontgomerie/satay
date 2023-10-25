@@ -1,0 +1,20 @@
+[device]
+name = "vcu110"
+part = "xcvu190-2flgc2104e-3"
+board = ""
+
+[resources]
+DSP   = 1800
+BRAM  = 7560
+FF    = 2148480
+LUT   = 1074240
+
+[system]
+board_frequency = 250 # in MHz
+memory_bandwidth = 100.0 # in Gbps
+reconfiguration_time = 0.08255 # in seconds
+port_width = 512
+
+[ethernet]
+bandwidth = 100.0 # in Gbps
+latency = 0.000005 # in seconds

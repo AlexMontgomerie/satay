@@ -1,0 +1,123 @@
+[[yolov3]]
+name = 'yolov3-tiny_imgsz320_fp16'
+head_in_tensor_names = [
+    "/model.20/m.0/Conv_output_0",
+    "/model.20/m.1/Conv_output_0"
+]
+head_out_tensor_names = ['output0']
+
+[[yolov3]]
+name = 'yolov3-tiny_imgsz640_fp16'
+head_in_tensor_names = [
+    "/model.20/m.0/Conv_output_0",
+    "/model.20/m.1/Conv_output_0"
+]
+head_out_tensor_names = ['output0']
+
+[[yolov5]]
+name = 'yolov5m_imgsz320_fp16'
+head_in_tensor_names = [
+    "/model.24/m.0/Conv_output_0",
+    "/model.24/m.1/Conv_output_0",
+    "/model.24/m.2/Conv_output_0"
+]
+head_out_tensor_names = ['output0']
+
+[[yolov5]]
+name = 'yolov5m_imgsz640_fp16'
+head_in_tensor_names = [
+    "/model.24/m.0/Conv_output_0",
+    "/model.24/m.1/Conv_output_0",
+    "/model.24/m.2/Conv_output_0"
+]
+head_out_tensor_names = ['output0']
+
+[[yolov5]]
+name = 'yolov5n_imgsz320_fp16'
+head_in_tensor_names = [
+    "/model.24/m.0/Conv_output_0",
+    "/model.24/m.1/Conv_output_0",
+    "/model.24/m.2/Conv_output_0"
+]
+head_out_tensor_names = ['output0']
+
+[[yolov5]]
+name = 'yolov5n_imgsz640_fp16'
+head_in_tensor_names = [
+    "/model.24/m.0/Conv_output_0",
+    "/model.24/m.1/Conv_output_0",
+    "/model.24/m.2/Conv_output_0"
+]
+head_out_tensor_names = ['output0']
+
+[[yolov5]]
+name = 'yolov5s_imgsz320_fp16'
+head_in_tensor_names = [
+    "/model.24/m.0/Conv_output_0",
+    "/model.24/m.1/Conv_output_0",
+    "/model.24/m.2/Conv_output_0"
+]
+head_out_tensor_names = ['output0']
+
+[[yolov5]]
+name = 'yolov5s_imgsz640_fp16'
+head_in_tensor_names = [
+    "/model.24/m.0/Conv_output_0",
+    "/model.24/m.1/Conv_output_0",
+    "/model.24/m.2/Conv_output_0"
+]
+head_out_tensor_names = ['output0']
+
+[[yolov8]]
+name = 'yolov8m_imgsz320_fp16'
+head_in_tensor_names = [
+    "/model.22/Concat_output_0",
+    "/model.22/Concat_1_output_0",
+    "/model.22/Concat_2_output_0"
+]
+head_out_tensor_names = ['output0']
+
+[[yolov8]]
+name = 'yolov8m_imgsz640_fp16'
+head_in_tensor_names = [
+    "/model.22/Concat_output_0",
+    "/model.22/Concat_1_output_0",
+    "/model.22/Concat_2_output_0"
+]
+head_out_tensor_names = ['output0']
+
+[[yolov8]]
+name = 'yolov8n_imgsz320_fp16'
+head_in_tensor_names = [
+    "/model.22/Concat_output_0",
+    "/model.22/Concat_1_output_0",
+    "/model.22/Concat_2_output_0"
+]
+head_out_tensor_names = ['output0']
+
+[[yolov8]]
+name = 'yolov8n_imgsz640_fp16'
+head_in_tensor_names = [
+    "/model.22/Concat_output_0",
+    "/model.22/Concat_1_output_0",
+    "/model.22/Concat_2_output_0"
+]
+head_out_tensor_names = ['output0']
+
+[[yolov8]]
+name = 'yolov8s_imgsz320_fp16'
+head_in_tensor_names = [
+    "/model.22/Concat_output_0",
+    "/model.22/Concat_1_output_0",
+    "/model.22/Concat_2_output_0"
+]
+head_out_tensor_names = ['output0']
+
+[[yolov8]]
+name = 'yolov8s_imgsz640_fp16'
+head_in_tensor_names = [
+    "/model.22/Concat_output_0",
+    "/model.22/Concat_1_output_0",
+    "/model.22/Concat_2_output_0"
+]
+head_out_tensor_names = ['output0']
