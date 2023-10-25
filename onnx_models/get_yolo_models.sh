@@ -1,9 +1,3 @@
-# Create a folder where the models will be stored
-mkdir SATAY-FPT23-Models
-
-# Move inside the folder
-cd SATAY-FPT23-Models
-
 # Create the folder and download YOLOv3 models
 mkdir yolov3
 cd yolov3
